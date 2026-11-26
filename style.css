@@ -208,3 +208,26 @@ code { font-size: 13px; background: var(--line); padding: 1px 5px; border-radius
 .lock-card button:disabled { opacity: .6; cursor: wait; }
 .error { color: var(--bad); min-height: 1.5em; }
 .linkish { background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; font-size: 13px; margin-left: 8px; }
+/* 핵심노트 */
+.note { border-top: 3px solid var(--accent); }
+.note-head { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+.note h3 { font-size: 17px; margin-bottom: 4px; }
+.nsec { margin-top: 14px; }
+.nlabel { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+.nlist, .nrules { margin: 0; padding-left: 20px; }
+.nlist li, .nrules li { margin: 3px 0; }
+.nrules li::marker { font-weight: 700; color: var(--accent); }
+.chunks { display: flex; flex-wrap: wrap; gap: 6px; }
+.chunks span { background: var(--hl); padding: 4px 10px; border-radius: 8px; font-size: 14px; }
+.traps { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.traps li { font-size: 14px; line-height: 1.5; }
+.traps .bad { color: var(--bad); text-decoration: line-through; text-decoration-color: var(--bad); }
+.traps .good { color: var(--good); font-weight: 600; }
+.traps .why { display: block; font-size: 13px; color: var(--muted); }
+.drill { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+.drill-q {
+  display: block; width: 100%; text-align: left; background: var(--bg); border: 1px dashed var(--line);
+  border-radius: 8px; padding: 8px 10px; cursor: pointer; font-size: 15px;
+}
+.drill-q.open { border-style: solid; border-color: var(--accent); }
+.drill-a { display: block; padding: 4px 10px 2px; color: var(--good); font-weight: 600; font-size: 14px; }

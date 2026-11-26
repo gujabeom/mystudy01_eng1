@@ -16,6 +16,7 @@
   const TABS = [
     { id: "basics", label: "기초" },
     { id: "advanced", label: "심화" },
+    { id: "notes", label: "핵심노트" },
     { id: "quiz", label: "문제" },
     { id: "confusions", label: "헷갈리는 것" },
     { id: "log", label: "업데이트" },
@@ -261,7 +262,7 @@
     currentCat = cat.id;
     const counts = {
       basics: cat.basics?.length, advanced: cat.advanced?.length, quiz: cat.quiz?.length,
-      confusions: cat.confusions?.length, log: cat.changelog?.length,
+      confusions: cat.confusions?.length, log: cat.changelog?.length, notes: cat.notes?.length,
     };
     view.innerHTML = `
       <a class="crumb" href="#/">← 전체 카테고리</a>
@@ -279,11 +280,41 @@
     }));
     const body = $("#tabBody");
     if (tab === "basics" || tab === "advanced") body.innerHTML = (cat[tab] || []).map(section).join("") || empty();
+    else if (tab === "notes") body.innerHTML = notesIntro(cat) + ((cat.notes || []).map(noteCard).join("") || empty());
     else if (tab === "confusions") body.innerHTML = (cat.confusions || []).map(confusion).join("") || empty();
     else if (tab === "log") body.innerHTML = changelog(cat);
     else renderQuizList(body, cat, cat.quiz || []);
   }
   const empty = () => `<p class="empty">아직 내용이 없습니다.</p>`;
+
+  // ---------- 핵심노트: 문제를 보자마자 '무엇을 묻는지' 알아채고 공식으로 푸는 정리노트 ----------
+  const notesIntro = (cat) => cat.notes?.length
+    ? `<p class="small muted" style="margin:12px 0 0">문제를 다 해석하지 않고도 '무엇을 묻는지' 알아채는 정리노트입니다. 30초 확인을 반복해서 손에 익히세요.</p>` : "";
+  function noteCard(n, i) {
+    const sec = (label, html) => (html ? `<div class="nsec"><div class="nlabel">${label}</div>${html}</div>` : "");
+    return `<article class="card note">
+      <div class="note-head"><span class="pill">핵심요약 ${i + 1}</span>${tierPill(n)}</div>
+      <h3>${fmt(n.title)}</h3>
+      ${sec("🎯 이렇게 물어본다", n.signals?.length ? `<ul class="nlist">${n.signals.map((t) => `<li>${fmt(t)}</li>`).join("")}</ul>` : "")}
+      ${sec("⚡ 판단 공식", n.rules?.length ? `<ol class="nrules">${n.rules.map((t) => `<li>${fmt(t)}</li>`).join("")}</ol>` : "")}
+      ${sec("📌 핵심 표현 (통째로 외우기)", n.chunks?.length ? `<div class="chunks en">${n.chunks.map((t) => `<span>${fmt(t)}</span>`).join("")}</div>` : "")}
+      ${sec("⚠️ 함정", n.traps?.length ? `<ul class="traps">${n.traps.map((t) => `<li><span class="bad en">✗ ${fmt(t.bad)}</span> → <span class="good en">${fmt(t.good)}</span>${t.why ? `<span class="why">${fmt(t.why)}</span>` : ""}</li>`).join("")}</ul>` : "")}
+      ${sec(`⏱ 30초 확인 <button type="button" class="linkish" data-drill-all>모두 보기</button>`, n.drill?.length ? `<ol class="drill">${n.drill.map((d) => `<li><button type="button" class="drill-q en">${fmt(d.q)}</button><span class="drill-a" hidden>${fmt(d.a)}</span></li>`).join("")}</ol>` : "")}
+      ${n.id ? rateBar(n.id) : ""}
+    </article>`;
+  }
+  document.addEventListener("click", (e) => {
+    const q = e.target.closest(".drill-q");
+    if (q) { const a = q.nextElementSibling; a.hidden = !a.hidden; q.classList.toggle("open", !a.hidden); return; }
+    const all = e.target.closest("[data-drill-all]");
+    if (all) {
+      const card = all.closest(".note");
+      const show = all.textContent === "모두 보기";
+      card.querySelectorAll(".drill-a").forEach((a) => { a.hidden = !show; });
+      card.querySelectorAll(".drill-q").forEach((x) => x.classList.toggle("open", show));
+      all.textContent = show ? "모두 가리기" : "모두 보기";
+    }
+  });
   const sourcePill = (s) => (s === "student" ? ` <span class="pill student">학생 질문에서 추가</span>` : "");
 
   function section(s) {
